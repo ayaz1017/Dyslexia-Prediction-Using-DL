@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dyslexia Handwriting Detection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #141e30, #243b55);
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            margin-top: 40px;
+            font-size: 2.5rem;
+        }
+
+        .upload-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            margin: 50px auto;
+            box-shadow: 0px 0px 20px rgba(0,0,0,0.3);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        label {
+            display: inline-block;
+            background: #ff9800;
+            padding: 12px 25px;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        label:hover {
+            background: #e68a00;
+        }
+
+        .submit-btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #4CAF50;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #45a049;
+        }
+
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            color: #ff9800;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .upload-box {
+                padding: 20px;
+                max-width: 90%;
+            }
+
+            .submit-btn, label {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Dyslexia Handwriting Detection</h1>
+
+    <div class="upload-box" aria-labelledby="upload-title">
+        <i class="fas fa-file-upload icon" aria-hidden="true"></i>
+        <form method="post" enctype="multipart/form-data" aria-label="Upload Handwriting Image">
+            <input type="file" name="file" id="file" accept="image/*" required aria-required="true">
+            <label for="file"><i class="fas fa-upload"></i> Choose Image</label>
+            <br>
+            <button type="submit" class="submit-btn"><i class="fas fa-search"></i> Analyze</button>
+        </form>
+    </div>
+</body>
+</html>

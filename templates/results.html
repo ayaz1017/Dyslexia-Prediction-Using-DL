@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #141e30, #243b55);
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            margin-top: 40px;
+            font-size: 2.5rem;
+        }
+        .result-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            margin: 50px auto;
+            box-shadow: 0px 0px 20px rgba(0,0,0,0.3);
+        }
+        img {
+            max-width: 300px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+        .prediction {
+            margin-top: 20px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ff9800;
+        }
+        .back-btn {
+            margin-top: 20px;
+            display: inline-block;
+            padding: 12px 25px;
+            background: #4CAF50;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+        .back-btn:hover {
+            background: #45a049;
+        }
+        .icon {
+            font-size: 4rem;
+            color: #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prediction Result</h1>
+
+    <div class="result-box">
+        <i class="fas fa-brain icon"></i>
+        <p class="prediction">{{ prediction_text }}</p>
+        <img src="{{ url_for('static', filename=image_file) }}" alt="Uploaded Image">
+        <br>
+        <a href="/" class="back-btn"><i class="fas fa-arrow-left"></i> Try Another Image</a>
+    </div>
+</body>
+</html>
