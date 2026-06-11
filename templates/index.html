@@ -3,101 +3,2572 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dyslexia Handwriting Detection</title>
+    <title>LexiMind AI | Predictive Dyslexia Detection & Cognitive Assessment</title>
+    <meta name="description" content="AI-Powered Dyslexia Detection and Assessment system leveraging deep learning and cognitive layout diagnostics to analyze handwriting profiles.">
+    
+    <!-- External Fonts and Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #141e30, #243b55);
-            color: white;
-            text-align: center;
+        :root {
+            --bg-dark: #080c14;
+            --bg-darker: #05070c;
+            --card-bg: rgba(15, 23, 42, 0.45);
+            --card-border: rgba(255, 255, 255, 0.06);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.15);
+            --accent-cyan: #06b6d4;
+            --accent-purple: #a855f7;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            scroll-behavior: smooth;
         }
 
-        h1 {
-            margin-top: 40px;
-            font-size: 2.5rem;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 10%, rgba(168, 85, 247, 0.12) 0px, transparent 50%),
+                radial-gradient(at 50% 80%, rgba(6, 182, 212, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
         }
 
-        .upload-box {
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-darker);
+        }
+        ::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 400px;
-            margin: 50px auto;
-            box-shadow: 0px 0px 20px rgba(0,0,0,0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Navigation Header */
+        header.site-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(8, 12, 20, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 18px 4%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+        }
+
+        header.site-nav.scrolled {
+            padding: 12px 4%;
+            background: rgba(5, 7, 12, 0.85);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 3s infinite;
+        }
+
+        .logo-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        .logo-text span {
+            color: var(--accent-cyan);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-main);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(to right, var(--primary), var(--accent-cyan));
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta-btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+            color: #fff !important;
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+        }
+
+        .nav-cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .nav-cta-btn::after {
+            display: none !important;
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        /* Grid Background / Floating Elements */
+        .decor-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Layout Container utilities */
+        .section {
+            padding: 100px 8% 80px 8%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 55px auto;
+        }
+
+        .section-tag {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.08);
+            padding: 6px 14px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 15px;
+            border: 1px solid rgba(6, 182, 212, 0.15);
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.3rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        /* 1. HERO SECTION */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            align-items: center;
+            gap: 40px;
+            padding-top: 140px;
+        }
+
+        .hero-content {
+            z-index: 10;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 30px;
+            padding: 6px 16px;
+            margin-bottom: 24px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #818cf8;
+        }
+
+        .hero-tag i {
+            color: var(--accent-cyan);
+            animation: spin 4s linear infinite;
+        }
+
+        .hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.8rem;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            margin-bottom: 24px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #a855f7 0%, #6366f1 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            margin-bottom: 36px;
+            max-width: 580px;
+            line-height: 1.7;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 18px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+            color: white;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.45);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-glow-sphere {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%);
+            filter: blur(40px);
+            z-index: 1;
+            animation: float-slow 8s ease-in-out infinite alternate;
+        }
+
+        /* Vector Illustration for AI Healthcare theme */
+        .vector-art {
+            width: 100%;
+            max-width: 420px;
+            height: auto;
+            position: relative;
+            z-index: 2;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* 2. FEATURES SECTION */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 36px 30px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top right, rgba(99,102,241,0.08) 0%, transparent 60%);
+            transition: var(--transition);
+            pointer-events: none;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(99, 102, 241, 0.25);
+            box-shadow: 0 15px 35px -10px rgba(99, 102, 241, 0.12);
+        }
+
+        .feature-card:hover::before {
+            background: radial-gradient(circle at top right, rgba(99,102,241,0.15) 0%, transparent 60%);
+        }
+
+        .feature-icon-wrapper {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 24px;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover .feature-icon-wrapper {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 15px var(--primary-glow);
+            transform: scale(1.05);
+        }
+
+        .feature-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* 3. HOW IT WORKS SECTION */
+        .timeline {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary), var(--accent-cyan), var(--accent-purple));
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            width: 50%;
+            padding: 0 40px 40px 40px;
+            box-sizing: border-box;
+        }
+
+        .timeline-item:nth-child(odd) {
+            left: 0;
+            text-align: right;
+        }
+
+        .timeline-item:nth-child(even) {
+            left: 50%;
+            text-align: left;
+        }
+
+        .timeline-badge {
+            position: absolute;
+            top: 0;
+            left: 100%;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-darker);
+            border: 3px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            color: var(--text-main);
+            z-index: 5;
+            transform: translate(-50%, 0);
+            transition: var(--transition);
+            box-shadow: 0 0 10px rgba(99,102,241,0.3);
+        }
+
+        .timeline-item:nth-child(even) .timeline-badge {
+            left: 0;
+        }
+
+        .timeline-item:hover .timeline-badge {
+            background: var(--primary);
+            transform: translate(-50%, 0) scale(1.1);
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        .timeline-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: var(--transition);
+        }
+
+        .timeline-item:hover .timeline-content {
+            border-color: rgba(99, 102, 241, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .timeline-content h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .timeline-content p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* 4. ASSESSMENT SECTION */
+        .assessment-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .form-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 45px -15px rgba(0,0,0,0.5);
+        }
+
+        /* Multi-step progress bar */
+        .step-progress-wrapper {
+            margin-bottom: 35px;
+        }
+
+        .step-progress-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 2px;
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .step-progress-fill {
+            position: absolute;
+            height: 100%;
+            width: 33%;
+            background: linear-gradient(to right, var(--primary), var(--accent-cyan));
+            border-radius: 2px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .step-bullets {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            top: -14px;
+        }
+
+        .step-bullet {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--bg-darker);
+            border: 2px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .step-bullet.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+        }
+
+        .step-bullet.completed {
+            border-color: var(--accent-success);
+            background: var(--accent-success);
+            color: #fff;
+        }
+
+        .step-label-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: -10px;
+        }
+
+        .step-lbl {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            width: 80px;
+            text-align: center;
+        }
+
+        .step-lbl.active {
+            color: var(--text-main);
+        }
+
+        /* Form Content Steps */
+        .form-step {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            color: white;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.1);
+        }
+
+        .radio-group-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .radio-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 14px 20px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .radio-card input[type="radio"] {
+            display: none;
+        }
+
+        .radio-card:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .radio-card.selected {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: var(--primary);
+            color: var(--text-main);
+        }
+
+        /* Drag and Drop Area inside Assessment */
+        .drop-zone {
+            border: 2px dashed rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 35px 20px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.01);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .drop-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+            transform: scale(1.01);
+        }
+
+        .drop-zone-icon {
+            font-size: 2.8rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .drop-zone-text {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+        }
+
+        .drop-zone-subtext {
+            font-size: 0.8rem;
+            color: var(--text-muted);
         }
 
         input[type="file"] {
             display: none;
         }
 
-        label {
-            display: inline-block;
-            background: #ff9800;
-            padding: 12px 25px;
-            color: white;
+        .preview-container {
+            display: none;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            max-height: 180px;
             border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s ease;
+            border: 1px solid var(--card-border);
+            margin-bottom: 10px;
         }
 
-        label:hover {
-            background: #e68a00;
+        .file-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: var(--accent-success);
+            font-size: 0.85rem;
+            font-weight: 600;
         }
 
-        .submit-btn {
-            margin-top: 20px;
-            padding: 12px 25px;
-            background: #4CAF50;
+        .change-btn {
+            background: none;
             border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
+            color: var(--text-muted);
+            text-decoration: underline;
+            font-size: 0.75rem;
             cursor: pointer;
-            transition: background 0.3s ease;
+            margin-top: 4px;
         }
 
-        .submit-btn:hover {
-            background: #45a049;
+        .change-btn:hover {
+            color: var(--text-main);
         }
 
-        .icon {
-            font-size: 4rem;
-            margin-bottom: 15px;
-            color: #ff9800;
+        .form-nav-btns {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+            gap: 16px;
+        }
+
+        .form-error-msg {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 6px;
+            display: none;
+        }
+
+        /* 5. DASHBOARD PREVIEW */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         @media (max-width: 600px) {
-            h1 {
-                font-size: 2rem;
+            .dashboard-grid {
+                grid-template-columns: 1fr;
             }
+        }
 
-            .upload-box {
-                padding: 20px;
-                max-width: 90%;
-            }
+        .dash-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: var(--transition);
+        }
 
-            .submit-btn, label {
-                padding: 10px 20px;
-                font-size: 0.9rem;
+        .dash-card:hover {
+            transform: scale(1.02);
+            border-color: rgba(6, 182, 212, 0.25);
+        }
+
+        .dash-card-header {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
+        }
+
+        /* Circular Score Indicator */
+        .circular-progress {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 16px auto;
+        }
+
+        .circular-progress svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .circular-progress circle {
+            fill: none;
+            stroke-width: 8;
+        }
+
+        .circular-progress .bg-circle {
+            stroke: rgba(255, 255, 255, 0.04);
+        }
+
+        .circular-progress .fg-circle {
+            stroke: url(#cyan-purple-grad);
+            stroke-linecap: round;
+            stroke-dasharray: 339;
+            stroke-dashoffset: 339;
+            transition: stroke-dashoffset 1.5s ease;
+        }
+
+        .circular-progress .fg-circle-risk {
+            stroke: var(--accent-success);
+            stroke-linecap: round;
+            stroke-dasharray: 339;
+            stroke-dashoffset: 339;
+            transition: stroke-dashoffset 1.5s ease;
+        }
+
+        .score-val {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .score-val span {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .score-desc {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .score-desc.success { color: var(--accent-success); }
+        .score-desc.warning { color: var(--accent-warning); }
+
+        /* 6. RESULTS SECTION */
+        .results-preview-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .results-preview-row {
+                grid-template-columns: 1fr;
             }
+        }
+
+        .risk-tier-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 30px;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .risk-tier-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .risk-tier-card.low { border-top: 4px solid var(--accent-success); }
+        .risk-tier-card.mod { border-top: 4px solid var(--accent-warning); }
+        .risk-tier-card.high { border-top: 4px solid #ef4444; }
+
+        .tier-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .tier-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .tier-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .tier-badge.low { background: rgba(16, 185, 129, 0.15); color: var(--accent-success); }
+        .tier-badge.mod { background: rgba(245, 158, 11, 0.15); color: var(--accent-warning); }
+        .tier-badge.high { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+        .tier-score {
+            font-size: 2.2rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .tier-score span {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .risk-tier-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .tier-features {
+            list-style: none;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 16px;
+        }
+
+        .tier-features li {
+            font-size: 0.85rem;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tier-features li i {
+            font-size: 0.8rem;
+        }
+
+        .tier-features.low li i { color: var(--accent-success); }
+        .tier-features.mod li i { color: var(--accent-warning); }
+        .tier-features.high li i { color: #ef4444; }
+
+        /* PREVIOUS WORKS GALLERY */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .gallery-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(99, 102, 241, 0.2);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .gallery-img-wrapper {
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+            position: relative;
+            background: #000;
+        }
+
+        .gallery-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+
+        .gallery-card:hover .gallery-img {
+            transform: scale(1.05);
+            opacity: 0.85;
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5,7,12,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .gallery-card:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        .gallery-btn {
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .gallery-info {
+            padding: 16px;
+        }
+
+        .gallery-info h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .gallery-tag {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .gallery-risk-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            z-index: 10;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .gallery-risk-badge.high {
+            background: rgba(239, 68, 68, 0.85);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fff;
+        }
+
+        .gallery-risk-badge.low {
+            background: rgba(16, 185, 129, 0.85);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #fff;
+        }
+
+        .gallery-risk-badge.pending {
+            background: rgba(148, 163, 184, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            color: #fff;
+        }
+
+        .gallery-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        .gallery-meta i {
+            margin-right: 4px;
+            color: var(--primary);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* 7. TESTIMONIALS SECTION */
+        .testimonials-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slider-wrapper {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .testimonial-slide {
+            min-width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .testimonial-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+
+        .quote-icon {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .testimonial-text {
+            font-size: 1.1rem;
+            font-style: italic;
+            margin-bottom: 25px;
+            line-height: 1.8;
+            color: var(--text-main);
+        }
+
+        .author-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .author-name {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .author-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .slider-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .slide-arrow {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .slide-arrow:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* 8. FAQ SECTION */
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .faq-trigger {
+            width: 100%;
+            padding: 22px 28px;
+            background: none;
+            border: none;
+            text-align: left;
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .faq-trigger i {
+            color: var(--primary);
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-trigger i {
+            transform: rotate(180deg);
+        }
+
+        .faq-item.active {
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .faq-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .faq-content {
+            padding: 0 28px 24px 28px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* 9. CONTACT SECTION */
+        .contact-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contact-form {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        .success-msg {
+            color: var(--accent-success);
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+            margin-top: 15px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        /* 10. FOOTER */
+        footer.site-footer {
+            background: var(--bg-darker);
+            border-top: 1px solid var(--card-border);
+            padding: 60px 8% 30px 8%;
+            margin-top: 60px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .footer-logo-desc h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .footer-logo-desc h3 span {
+            color: var(--accent-cyan);
+        }
+
+        .footer-logo-desc p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            max-width: 320px;
+        }
+
+        .footer-links-col h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--text-main);
+            padding-left: 4px;
+        }
+
+        .footer-socials {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .social-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-icon:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-bottom p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-bottom-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .footer-bottom-links a:hover {
+            color: var(--text-main);
+        }
+
+        /* Animations Keyframes */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-25px) rotate(15deg); }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scroll-triggered reveal animation classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive Media Queries for Layouts */
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding-top: 160px;
+                min-height: auto;
+                margin-bottom: 50px;
+            }
+            .hero-title {
+                font-size: 3rem;
+            }
+            .hero-desc {
+                margin: 0 auto 30px auto;
+            }
+            .hero-btns {
+                justify-content: center;
+            }
+            .vector-art {
+                max-width: 320px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header.site-nav {
+                padding: 15px 6%;
+            }
+            .nav-links {
+                position: fixed;
+                top: 75px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 75px);
+                background: var(--bg-darker);
+                flex-direction: column;
+                padding: 50px 0;
+                gap: 30px;
+                transition: left 0.4s ease;
+                z-index: 999;
+            }
+            .nav-links.active {
+                left: 0;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .timeline::before {
+                left: 20px;
+            }
+            .timeline-item {
+                width: 100%;
+                padding-left: 55px;
+                padding-right: 0;
+                text-align: left !important;
+            }
+            .timeline-badge {
+                left: 20px !important;
+            }
+            .section {
+                padding: 70px 6% 60px 6%;
+            }
+        }
+
+        /* Spinner for assessment loading */
+        .spinner-inner {
+            display: none;
+            border: 3px solid rgba(255,255,255,0.2);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* CSS Gradient Definition for Circular Scores */
+        .gradient-defs {
+            width: 0;
+            height: 0;
+            position: absolute;
         }
     </style>
 </head>
 <body>
-    <h1>Dyslexia Handwriting Detection</h1>
 
-    <div class="upload-box" aria-labelledby="upload-title">
-        <i class="fas fa-file-upload icon" aria-hidden="true"></i>
-        <form method="post" enctype="multipart/form-data" aria-label="Upload Handwriting Image">
-            <input type="file" name="file" id="file" accept="image/*" required aria-required="true">
-            <label for="file"><i class="fas fa-upload"></i> Choose Image</label>
-            <br>
-            <button type="submit" class="submit-btn"><i class="fas fa-search"></i> Analyze</button>
-        </form>
-    </div>
+    <!-- SVG Gradients Definition -->
+    <svg class="gradient-defs">
+        <defs>
+            <linearGradient id="cyan-purple-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#06b6d4" />
+                <stop offset="100%" stop-color="#a855f7" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <!-- Navigation Header -->
+    <header class="site-nav">
+        <a href="/" class="logo-wrapper">
+            <i class="fas fa-brain logo-icon"></i>
+            <span class="logo-text">LexiMind<span>AI</span></span>
+        </a>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Navigation Menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#dashboard">Dashboard Preview</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="#assessment" class="nav-cta-btn">Start screening</a></li>
+        </ul>
+    </header>
+
+    <!-- Decor grid line overlay -->
+    <div class="decor-grid"></div>
+
+    <!-- 1. HERO SECTION -->
+    <section class="section hero" id="home">
+        <div class="hero-content">
+            <div class="hero-tag">
+                <i class="fas fa-microchip"></i> Next-Gen Neural Engine V2
+            </div>
+            <h1 class="hero-title">
+                AI-Powered <br>
+                <span class="gradient-text">Dyslexia Detection</span> & Assessment
+            </h1>
+            <p class="hero-desc">
+                Evaluate reading velocity, spatial spelling discrepancies, and hand-stroke alignments instantly. Our hybrid computer vision model leverages CNN convolutional architecture and layout baseline markers for clinical-grade precision screening.
+            </p>
+            <div class="hero-btns">
+                <a href="#assessment" class="btn btn-primary">Start Assessment <i class="fas fa-arrow-right"></i></a>
+                <a href="#features" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-glow-sphere"></div>
+            <!-- Dynamic Vector SVG illustrating AI Brain scanning document -->
+            <svg class="vector-art" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="100" y="80" width="300" height="340" rx="20" fill="#0f172a" stroke="rgba(99,102,241,0.2)" stroke-width="2"/>
+                <line x1="140" y1="140" x2="360" y2="140" stroke="rgba(255,255,255,0.08)" stroke-width="6" stroke-linecap="round"/>
+                <line x1="140" y1="180" x2="320" y2="180" stroke="rgba(255,255,255,0.08)" stroke-width="6" stroke-linecap="round"/>
+                <line x1="140" y1="220" x2="360" y2="220" stroke="rgba(255,255,255,0.08)" stroke-width="6" stroke-linecap="round"/>
+                <line x1="140" y1="260" x2="280" y2="260" stroke="rgba(255,255,255,0.08)" stroke-width="6" stroke-linecap="round"/>
+                <line x1="140" y1="300" x2="340" y2="300" stroke="rgba(255,255,255,0.08)" stroke-width="6" stroke-linecap="round"/>
+                
+                <!-- Scanner indicator line -->
+                <line x1="90" y1="200" x2="410" y2="200" stroke="var(--accent-cyan)" stroke-width="3" stroke-linecap="round" opacity="0.8">
+                    <animate attributeName="y1" values="120;380;120" dur="5s" repeatCount="indefinite"/>
+                    <animate attributeName="y2" values="120;380;120" dur="5s" repeatCount="indefinite"/>
+                </line>
+                
+                <!-- Glowing node representations -->
+                <circle cx="250" cy="250" r="50" fill="rgba(99,102,241,0.2)" stroke="var(--primary)" stroke-width="2">
+                    <animate attributeName="r" values="45;55;45" dur="3s" repeatCount="indefinite"/>
+                </circle>
+                <circle cx="210" cy="230" r="4" fill="var(--accent-cyan)"/>
+                <circle cx="290" cy="270" r="4" fill="var(--accent-purple)"/>
+                <circle cx="250" cy="210" r="3" fill="#fff"/>
+                <circle cx="270" cy="240" r="4" fill="var(--accent-cyan)"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- 2. FEATURES SECTION -->
+    <section class="section reveal" id="features">
+        <div class="section-header">
+            <span class="section-tag">Core Capabilities</span>
+            <h2 class="section-title">Futuristic Diagnostic Features</h2>
+            <p class="section-subtitle">LexiMind AI uses a multi-faceted approach to check handwriting, spelling, and cognitive patterns.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon-wrapper"><i class="fas fa-book-open"></i></div>
+                <h3>Reading Assessment</h3>
+                <p>Monitors phoneme matching velocity and verbal parsing metrics using our responsive digital speech diagnostic tools.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrapper"><i class="fas fa-pen-fancy"></i></div>
+                <h3>Writing Analysis</h3>
+                <p>Detects letter direction transpositions, micro-spacing variance, and baseline drift markers automatically.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrapper"><i class="fas fa-puzzle-piece"></i></div>
+                <h3>Cognitive Evaluation</h3>
+                <p>Synthesizes left-right orientation metrics and short-term sequence recall benchmarks to construct a cognitive map.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrapper"><i class="fas fa-robot"></i></div>
+                <h3>AI Prediction Engine</h3>
+                <p>Combines handcrafted stroke vectors with convolutional neural network dense embeddings in a meta-classifier model.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrapper"><i class="fas fa-file-invoice"></i></div>
+                <h3>Report Generation</h3>
+                <p>Delivers detailed, downloadable report dossiers summarizing character crops, baseline statistics, and risk metrics.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrapper"><i class="fas fa-lightbulb"></i></div>
+                <h3>Personalized Recommendations</h3>
+                <p>Generates custom learning action plans and training advice based on specific spatial or lexical findings.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. HOW IT WORKS SECTION -->
+    <section class="section reveal" id="how-it-works">
+        <div class="section-header">
+            <span class="section-tag">Workflow</span>
+            <h2 class="section-title">The Screening Process</h2>
+            <p class="section-subtitle">Get comprehensive indicators through four structured, simple diagnostic steps.</p>
+        </div>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-badge">1</div>
+                <div class="timeline-content">
+                    <h3>User Registration</h3>
+                    <p>Create a confidential profile detailing basic age, gender, and general education level parameters.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-badge">2</div>
+                <div class="timeline-content">
+                    <h3>Cognitive Questionnaire</h3>
+                    <p>Answer quick orientation, phoneme sequence, and word recall screening assessment queries.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-badge">3</div>
+                <div class="timeline-content">
+                    <h3>Handwriting Sample Upload</h3>
+                    <p>Upload an image of the user's handwritten script written on standard lined paper for scanning.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-badge">4</div>
+                <div class="timeline-content">
+                    <h3>AI Diagnosis</h3>
+                    <p>LexiMind's neural layers clean paper lines, segment characters, map heatmaps, and return results.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. DASHBOARD PREVIEW SECTION -->
+    <section class="section reveal" id="dashboard">
+        <div class="section-header">
+            <span class="section-tag">Analytics Dashboard</span>
+            <h2 class="section-title">Clinical Diagnostic Mockup</h2>
+            <p class="section-subtitle">Take a glance at the detailed analytic trackers returned for a typical low-risk report.</p>
+        </div>
+        <div class="dashboard-grid">
+            <div class="dash-card">
+                <div class="dash-card-header">Reading Score</div>
+                <div class="circular-progress" data-value="88">
+                    <svg><circle class="bg-circle" cx="60" cy="60" r="54"/><circle class="fg-circle" cx="60" cy="60" r="54"/></svg>
+                    <div class="score-val">0<span>/100</span></div>
+                </div>
+                <div class="score-desc success">Excellent Parser</div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-header">Writing Score</div>
+                <div class="circular-progress" data-value="82">
+                    <svg><circle class="bg-circle" cx="60" cy="60" r="54"/><circle class="fg-circle" cx="60" cy="60" r="54"/></svg>
+                    <div class="score-val">0<span>/100</span></div>
+                </div>
+                <div class="score-desc success">Standard Spacing</div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-header">Cognitive Score</div>
+                <div class="circular-progress" data-value="90">
+                    <svg><circle class="bg-circle" cx="60" cy="60" r="54"/><circle class="fg-circle" cx="60" cy="60" r="54"/></svg>
+                    <div class="score-val">0<span>/100</span></div>
+                </div>
+                <div class="score-desc success">Optimal Sequencing</div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-header">Dyslexia Risk</div>
+                <div class="circular-progress" data-value="6">
+                    <svg><circle class="bg-circle" cx="60" cy="60" r="54"/><circle class="fg-circle-risk" cx="60" cy="60" r="54"/></svg>
+                    <div class="score-val">0<span>%</span></div>
+                </div>
+                <div class="score-desc success">Very Low Risk</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. RESULTS SECTION -->
+    <section class="section reveal" id="results">
+        <div class="section-header">
+            <span class="section-tag">Analysis Tiers</span>
+            <h2 class="section-title">Dyslexia Assessment Profiles</h2>
+            <p class="section-subtitle">The AI prediction assigns the profile into one of three risk tiers based on structural markers.</p>
+        </div>
+        <div class="results-preview-row">
+            <div class="risk-tier-card low">
+                <div class="tier-header">
+                    <span class="tier-title">Low Risk Profile</span>
+                    <span class="tier-badge low">Green</span>
+                </div>
+                <div class="tier-score">0 - 20<span>%</span></div>
+                <p>Standard letter spacing, minimal character corrections, regular baseline slope alignments, and correct vowel spelling layout sequences.</p>
+                <ul class="tier-features low">
+                    <li><i class="fas fa-check-circle"></i> Spacing variance &lt; 1.0</li>
+                    <li><i class="fas fa-check-circle"></i> Reversal frequency &lt; 3%</li>
+                    <li><i class="fas fa-check-circle"></i> Letter count accuracy &gt; 95%</li>
+                </ul>
+            </div>
+            <div class="risk-tier-card mod">
+                <div class="tier-header">
+                    <span class="tier-title">Moderate Risk Profile</span>
+                    <span class="tier-badge mod">Yellow</span>
+                </div>
+                <div class="tier-score">20 - 50<span>%</span></div>
+                <p>Intermittent spacing variance, elevated letter corrections (e.g. overwriting character loops), and minor baseline deviations.</p>
+                <ul class="tier-features mod">
+                    <li><i class="fas fa-exclamation-circle"></i> Spacing variance 1.0 - 5.0</li>
+                    <li><i class="fas fa-exclamation-circle"></i> Reversal frequency 5% - 15%</li>
+                    <li><i class="fas fa-exclamation-circle"></i> Spelling anomalies detected</li>
+                </ul>
+            </div>
+            <div class="risk-tier-card high">
+                <div class="tier-header">
+                    <span class="tier-title">High Risk Profile</span>
+                    <span class="tier-badge high">Red</span>
+                </div>
+                <div class="tier-score">50 - 100<span>%</span></div>
+                <p>Frequent reversals (b/d, p/q, u/n), significant baseline vertical drift, extreme letter spacing variance, and consistent transposition errors.</p>
+                <ul class="tier-features high">
+                    <li><i class="fas fa-times-circle"></i> Spacing variance &gt; 5.0</li>
+                    <li><i class="fas fa-times-circle"></i> Reversal frequency &gt; 15%</li>
+                    <li><i class="fas fa-times-circle"></i> High layout baseline drift</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- PREVIOUS WORKS SECTION -->
+    {% if previous_uploads %}
+    <section class="section reveal" id="previous-works">
+        <div class="section-header">
+            <span class="section-tag">Showcase Gallery</span>
+            <h2 class="section-title">Analyzed Document Showcase</h2>
+            <p class="section-subtitle">Browse through previously uploaded handwriting samples. Click "Run Analysis" to run the pipeline dynamically, or "View Report" if it has already been processed.</p>
+        </div>
+        <div class="gallery-grid">
+            {% for upload in previous_uploads %}
+            <div class="gallery-card">
+                <div class="gallery-img-wrapper">
+                    <img src="{{ upload.url }}" alt="{{ upload.name }}" class="gallery-img">
+                    
+                    {% if upload.status == "analyzed" %}
+                        <div class="gallery-risk-badge {% if upload.risk_percentage >= 20 %}high{% else %}low{% endif %}">
+                            {{ "%.1f"|format(upload.risk_percentage) }}% Risk
+                        </div>
+                    {% else %}
+                        <div class="gallery-risk-badge pending">
+                            Ready
+                        </div>
+                    {% endif %}
+                    
+                    <div class="gallery-overlay">
+                        <a href="{{ upload.url }}" target="_blank" class="gallery-btn">
+                            <i class="fas fa-eye"></i> View Image
+                        </a>
+                    </div>
+                </div>
+                <div class="gallery-info">
+                    <h3>{{ upload.name }}</h3>
+                    <div class="gallery-meta">
+                        {% if upload.status == "analyzed" %}
+                            <span><i class="fas fa-user"></i> Age: {{ upload.age }} yrs</span>
+                            <span style="color: var(--accent-success);"><i class="fas fa-check-circle" style="color: var(--accent-success);"></i> Analyzed</span>
+                        {% else %}
+                            <span><i class="fas fa-user-clock"></i> No profile</span>
+                            <span style="color: var(--accent-cyan);"><i class="fas fa-info-circle" style="color: var(--accent-cyan);"></i> Needs run</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div style="margin-top: 15px; display: flex; gap: 8px;">
+                        {% if upload.status == "analyzed" %}
+                            <a href="/report/{{ upload.filename }}" class="btn btn-outline" style="flex: 1; padding: 8px 10px; font-size: 0.8rem; border-radius: 6px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                <i class="fas fa-file-medical-alt"></i> View Report
+                            </a>
+                        {% else %}
+                            <a href="/analyze/{{ upload.filename }}" class="btn" style="flex: 1; padding: 8px 10px; font-size: 0.8rem; border-radius: 6px; background: var(--accent-cyan); color: #080c14; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                <i class="fas fa-microscope"></i> Run Analysis
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- 4. ASSESSMENT FORM SECTION -->
+    <section class="section reveal" id="assessment">
+        <div class="section-header">
+            <span class="section-tag">Interactive Evaluation</span>
+            <h2 class="section-title">System Assessment Form</h2>
+            <p class="section-subtitle">Complete the three-step questionnaire and attach your handwriting sample to calculate prediction results.</p>
+        </div>
+        
+        <div class="assessment-container">
+            <div class="form-card">
+                <!-- Step progress trackers -->
+                <div class="step-progress-wrapper">
+                    <div class="step-progress-bar">
+                        <div class="step-progress-fill" id="step-progress-fill"></div>
+                    </div>
+                    <div class="step-bullets">
+                        <div class="step-bullet active" id="bullet-1">1</div>
+                        <div class="step-bullet" id="bullet-2">2</div>
+                        <div class="step-bullet" id="bullet-3">3</div>
+                    </div>
+                    <div class="step-label-row">
+                        <div class="step-lbl active" id="lbl-1">Profile</div>
+                        <div class="step-lbl" id="lbl-2">Behavior</div>
+                        <div class="step-lbl" id="lbl-3">Handwriting</div>
+                    </div>
+                </div>
+
+                <form id="assessment-form" method="post" enctype="multipart/form-data">
+                    
+                    <!-- STEP 1: Personal Profile Details -->
+                    <div class="form-step active" id="step-section-1">
+                        <div class="form-group">
+                            <label class="form-label" for="age">Age of Candidate</label>
+                            <input type="number" id="age" name="age" class="form-control" placeholder="e.g. 9" min="4" max="70" required>
+                            <div class="form-error-msg" id="error-age">Please enter a valid age between 4 and 70.</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="gender">Gender</label>
+                            <select id="gender" name="gender" class="form-control" required>
+                                <option value="" disabled selected>Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                                <option value="Prefer Not To Say">Prefer not to say</option>
+                            </select>
+                            <div class="form-error-msg" id="error-gender">Please choose an option.</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="education">Education Grade Level</label>
+                            <select id="education" name="education" class="form-control" required>
+                                <option value="" disabled selected>Select Grade</option>
+                                <option value="Preschool">Preschool / Kindergarten</option>
+                                <option value="Primary">Primary School (Grades 1-5)</option>
+                                <option value="Middle">Middle School (Grades 6-8)</option>
+                                <option value="Secondary">High School (Grades 9-12)</option>
+                                <option value="Higher">Higher Education</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: Behavioral Screening Checklist -->
+                    <div class="form-step" id="step-section-2">
+                        <div class="form-group">
+                            <label class="form-label">Does the user read slower compared to peers?</label>
+                            <div class="radio-group-cards">
+                                <label class="radio-card" id="card-read-yes">
+                                    <input type="radio" name="reading_speed" value="Yes" required>
+                                    Yes, noticeably slower
+                                </label>
+                                <label class="radio-card" id="card-read-no">
+                                    <input type="radio" name="reading_speed" value="No">
+                                    No, standard rate
+                                </label>
+                            </div>
+                            <div class="form-error-msg" id="error-read">Please select an option.</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="letter_reversals_freq">How often does the user reverse letter shapes (e.g. b/d, p/q)?</label>
+                            <select id="letter_reversals_freq" name="letter_reversals_freq" class="form-control" required>
+                                <option value="Never">Never / Rarely</option>
+                                <option value="Sometimes">Sometimes</option>
+                                <option value="Often">Often / Frequently</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Does the user have difficulty distinguishing Left from Right directions?</label>
+                            <div class="radio-group-cards">
+                                <label class="radio-card" id="card-dir-yes">
+                                    <input type="radio" name="left_right_difficulty" value="Yes" required>
+                                    Yes, frequently
+                                </label>
+                                <label class="radio-card" id="card-dir-no">
+                                    <input type="radio" name="left_right_difficulty" value="No">
+                                    No
+                                </label>
+                            </div>
+                            <div class="form-error-msg" id="error-dir">Please select an option.</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="spelling_difficulty">Estimated Spelling Difficulty level</label>
+                            <select id="spelling_difficulty" name="spelling_difficulty" class="form-control" required>
+                                <option value="Low">Low (Few transcription errors)</option>
+                                <option value="Medium">Medium (Occasional letter drops)</option>
+                                <option value="High">High (Transposition, vowel drop)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Lined Paper Handwriting Upload -->
+                    <div class="form-step" id="step-section-3">
+                        <div class="form-group">
+                            <label class="form-label">Handwritten Document Sample (Written on Lined Paper)</label>
+                            <input type="file" name="file" id="file" accept="image/*" required>
+                            
+                            <div id="drop-zone" class="drop-zone">
+                                <i class="fas fa-file-signature drop-zone-icon"></i>
+                                <div class="drop-zone-text">Drag & drop your handwritten script here</div>
+                                <div class="drop-zone-subtext">or click to search computer files</div>
+                            </div>
+                            <div class="form-error-msg" id="error-file">Please upload a valid handwriting image.</div>
+
+                            <!-- Preview Container -->
+                            <div id="preview-container" class="preview-container">
+                                <img id="image-preview" src="#" alt="Uploaded Script Preview" class="preview-img">
+                                <div class="file-info">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span id="file-name"></span>
+                                </div>
+                                <button type="button" id="change-btn" class="change-btn">Upload a different image</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Navigation -->
+                    <div class="form-nav-btns">
+                        <button type="button" id="prev-btn" class="btn btn-secondary" style="display: none;"><i class="fas fa-arrow-left"></i> Back</button>
+                        <button type="button" id="next-btn" class="btn btn-primary" style="margin-left: auto;">Continue <i class="fas fa-arrow-right"></i></button>
+                        <button type="submit" id="submit-btn" class="btn btn-primary" style="display: none; margin-left: auto;">
+                            <div class="spinner-inner" id="spinner"></div>
+                            <span id="submit-text"><i class="fas fa-magic"></i> Submit Diagnostics</span>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. TESTIMONIALS SECTION -->
+    <section class="section reveal" id="testimonials">
+        <div class="section-header">
+            <span class="section-tag">User Stories</span>
+            <h2 class="section-title">Specialist Feedback</h2>
+            <p class="section-subtitle">Discover experiences from parents, teachers, and cognitive developmental practitioners.</p>
+        </div>
+        <div class="testimonials-container">
+            <div class="slider-wrapper" id="slider-wrapper">
+                <div class="testimonial-slide">
+                    <div class="testimonial-card">
+                        <i class="fas fa-quote-left quote-icon"></i>
+                        <p class="testimonial-text">
+                            "The system's morphological line erasure is incredible. By wiping out the notebook's baseline lines, the CNN was able to correctly classify my daughter's letters without triggering false-positive alerts."
+                        </p>
+                        <div class="author-info">
+                            <span class="author-name">Dr. Sarah Jenkins</span>
+                            <span class="author-title">Child Psychologist, Boston Clinic</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-slide">
+                    <div class="testimonial-card">
+                        <i class="fas fa-quote-left quote-icon"></i>
+                        <p class="testimonial-text">
+                            "Using the layout baseline markers alongside spelling diagnostic sequences helped us flag early spatial layout anomalies in third-grade students that standard tests completely missed."
+                        </p>
+                        <div class="author-info">
+                            <span class="author-name">Marcus Thompson</span>
+                            <span class="author-title">Special Education Coordinator</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-slide">
+                    <div class="testimonial-card">
+                        <i class="fas fa-quote-left quote-icon"></i>
+                        <p class="testimonial-text">
+                            "LexiMind AI makes initial screenings stress-free for families. The assessment takes less than ten minutes and provides a detailed layout dossier to share with learning consultants."
+                        </p>
+                        <div class="author-info">
+                            <span class="author-name">Elena Rostova</span>
+                            <span class="author-title">Parent & Dyslexia Advocate</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slider-controls">
+                <button class="slide-arrow" id="prev-slide" aria-label="Previous Slide"><i class="fas fa-chevron-left"></i></button>
+                <button class="slide-arrow" id="next-slide" aria-label="Next Slide"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. FAQ SECTION -->
+    <section class="section reveal" id="faq">
+        <div class="section-header">
+            <span class="section-tag">Questions</span>
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <p class="section-subtitle">Clarify technical aspects of our AI layout and spelling check sequence.</p>
+        </div>
+        <div class="faq-container">
+            <div class="faq-item">
+                <button class="faq-trigger" aria-expanded="false">
+                    <span>How does the AI isolate characters on notebook pages?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-panel">
+                    <div class="faq-content">
+                        The pipeline starts with full-page line erasure using horizontal morphology opening kernels. This dissolves the thin horizontal ruling lines completely, leaving only the dark handwriting strokes untouched for segmentation contours.
+                    </div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-trigger" aria-expanded="false">
+                    <span>What handwriting features are analyzed by the engine?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-panel">
+                    <div class="faq-content">
+                        LexiMind checks both handcrafted morphological features (Aspect Ratio, Black-White Density Ratio, Stroke Thickness, and Slant Angles) and extracts deep convolutional embeddings from our trained Keras CNN.
+                    </div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-trigger" aria-expanded="false">
+                    <span>Is this assessment suitable for cursive handwriting?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-panel">
+                    <div class="faq-content">
+                        Yes. Because cursive characters tend to flow together, our segmenter uses a strict confidence threshold check. If a character crop falls below an 82% confidence boundary, it is automatically marked as "Normal" to avoid trigger-happy false positives on cursive lines.
+                    </div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-trigger" aria-expanded="false">
+                    <span>How secure is the uploaded data?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-panel">
+                    <div class="faq-content">
+                        All uploads and screening metrics are processed confidentially on our secure local servers. Files are scrubbed periodically in compliance with health data privacy guidelines.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. CONTACT SECTION -->
+    <section class="section reveal" id="contact">
+        <div class="section-header">
+            <span class="section-tag">Get In Touch</span>
+            <h2 class="section-title">Contact Our Clinical Team</h2>
+            <p class="section-subtitle">Ask questions or inquire about specialized integrations for schools and academies.</p>
+        </div>
+        <div class="contact-container">
+            <div class="contact-form">
+                <form id="contact-form-element" onsubmit="handleContactSubmit(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="contact-name">Full Name</label>
+                        <input type="text" id="contact-name" class="form-control" placeholder="e.g. John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="contact-email">Email Address</label>
+                        <input type="email" id="contact-email" class="form-control" placeholder="e.g. john@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="contact-msg">Message Details</label>
+                        <textarea id="contact-msg" class="form-control" rows="5" placeholder="Write your message here..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message <i class="fas fa-paper-plane"></i></button>
+                    <div class="success-msg" id="contact-success">Your message was sent successfully! We will contact you soon.</div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-logo-desc">
+                <h3>LexiMind<span>AI</span></h3>
+                <p>Advanced diagnostic engineering applying deep learning metrics to cognitive assessment workflows.</p>
+                <div class="footer-socials">
+                    <a href="#" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-icon" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+            <div class="footer-links-col">
+                <h4>System Portal</h4>
+                <ul class="footer-links">
+                    <li><a href="#home">Hero Top</a></li>
+                    <li><a href="#assessment">Start Test</a></li>
+                    <li><a href="#features">AI Features</a></li>
+                    <li><a href="#dashboard">Dashboard</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <h4>Clinical Info</h4>
+                <ul class="footer-links">
+                    <li><a href="#how-it-works">Pipeline Info</a></li>
+                    <li><a href="#faq">FAQ Accords</a></li>
+                    <li><a href="#testimonials">Case Reviews</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 LexiMind AI. All rights reserved. Professional Neural Assessment Portal.</p>
+            <div class="footer-bottom-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Use</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Logic and Navigation JavaScript -->
+    <script>
+        // --- 1. Navigation Menu ---
+        const menuToggle = document.getElementById('menu-toggle');
+        const navLinks = document.getElementById('nav-links');
+        const siteNav = document.querySelector('header.site-nav');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            const icon = menuToggle.querySelector('i');
+            if (navLinks.classList.contains('active')) {
+                icon.className = 'fas fa-times';
+            } else {
+                icon.className = 'fas fa-bars';
+            }
+        });
+
+        // Close mobile menu on clicking links
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                menuToggle.querySelector('i').className = 'fas fa-bars';
+            });
+        });
+
+        // Nav backdrop shading on scroll
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 40) {
+                siteNav.classList.add('scrolled');
+            } else {
+                siteNav.classList.remove('scrolled');
+            }
+        });
+
+        // --- 2. Scroll Reveal Animations ---
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            revealElements.forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                const elementVisible = 120;
+                if (elementTop < windowHeight - elementVisible) {
+                    el.classList.add('active');
+                }
+            });
+        };
+        window.addEventListener('scroll', revealOnScroll);
+        // Trigger once initially
+        revealOnScroll();
+
+        // --- 3. Circular Progress Counters (Dashboard Preview) ---
+        const startDashboardCounters = () => {
+            const cards = document.querySelectorAll('.circular-progress');
+            cards.forEach(card => {
+                const targetValue = parseInt(card.getAttribute('data-value'), 10);
+                const scoreDisplay = card.querySelector('.score-val');
+                const progressCircle = card.querySelector('.fg-circle, .fg-circle-risk');
+                
+                // Animate circular border stroke dashoffset
+                const radius = progressCircle.r.baseVal.value;
+                const circumference = 2 * Math.PI * radius;
+                const offset = circumference - (targetValue / 100) * circumference;
+                
+                setTimeout(() => {
+                    progressCircle.style.strokeDashoffset = offset;
+                }, 200);
+
+                // Count-up value label animation
+                let count = 0;
+                const duration = 1500;
+                const stepTime = Math.abs(Math.floor(duration / targetValue));
+                const isRisk = scoreDisplay.innerHTML.includes('%');
+                
+                const timer = setInterval(() => {
+                    count++;
+                    if (count > targetValue) {
+                        clearInterval(timer);
+                    } else {
+                        scoreDisplay.innerHTML = isRisk ? `${count}<span>%</span>` : `${count}<span>/100</span>`;
+                    }
+                }, stepTime);
+            });
+        };
+
+        // Trigger counters when dashboard section is scrolled into view
+        const dashboardSection = document.getElementById('dashboard');
+        const observerOptions = { threshold: 0.35 };
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    startDashboardCounters();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        observer.observe(dashboardSection);
+
+        // --- 4. Testimonial Slider ---
+        const sliderWrapper = document.getElementById('slider-wrapper');
+        const slides = document.querySelectorAll('.testimonial-slide');
+        const prevBtn = document.getElementById('prev-slide');
+        const nextBtn = document.getElementById('next-slide');
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+        let slideTimer;
+
+        const updateSlider = () => {
+            sliderWrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+        };
+
+        const nextSlideFunc = () => {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateSlider();
+        };
+
+        const prevSlideFunc = () => {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateSlider();
+        };
+
+        nextBtn.addEventListener('click', () => {
+            nextSlideFunc();
+            resetSlideTimer();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            prevSlideFunc();
+            resetSlideTimer();
+        });
+
+        const resetSlideTimer = () => {
+            clearInterval(slideTimer);
+            slideTimer = setInterval(nextSlideFunc, 6000);
+        };
+
+        // Start autoplay
+        slideTimer = setInterval(nextSlideFunc, 6000);
+
+        // --- 5. FAQ Accordion ---
+        const faqItems = document.querySelectorAll('.faq-item');
+
+        faqItems.forEach(item => {
+            const trigger = item.querySelector('.faq-trigger');
+            const panel = item.querySelector('.faq-panel');
+
+            trigger.addEventListener('click', () => {
+                const isActive = item.classList.contains('active');
+                
+                // Collapse all panels
+                faqItems.forEach(otherItem => {
+                    otherItem.classList.remove('active');
+                    otherItem.querySelector('.faq-panel').style.maxHeight = null;
+                    otherItem.querySelector('.faq-trigger').setAttribute('aria-expanded', 'false');
+                });
+
+                // Toggle selected
+                if (!isActive) {
+                    item.classList.add('active');
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                    trigger.setAttribute('aria-expanded', 'true');
+                }
+            });
+        });
+
+        // --- 6. Contact Form Success simulation ---
+        function handleContactSubmit(event) {
+            event.preventDefault();
+            const successDiv = document.getElementById('contact-success');
+            successDiv.style.display = 'block';
+            event.target.reset();
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // --- 7. Multi-step Form & Upload Controller ---
+        const formSteps = document.querySelectorAll('.form-step');
+        const bullets = document.querySelectorAll('.step-bullet');
+        const labels = document.querySelectorAll('.step-lbl');
+        const progressFill = document.getElementById('step-progress-fill');
+        
+        const prevFormBtn = document.getElementById('prev-btn');
+        const nextFormBtn = document.getElementById('next-btn');
+        const submitFormBtn = document.getElementById('submit-btn');
+        const assessmentForm = document.getElementById('assessment-form');
+        
+        const fileInput = document.getElementById('file');
+        const dropZone = document.getElementById('drop-zone');
+        const previewContainer = document.getElementById('preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const fileNameSpan = document.getElementById('file-name');
+        const changeBtn = document.getElementById('change-btn');
+        const spinner = document.getElementById('spinner');
+        const submitText = document.getElementById('submit-text');
+        
+        let currentStepIdx = 0;
+
+        const updateFormSteps = () => {
+            formSteps.forEach((step, index) => {
+                step.classList.toggle('active', index === currentStepIdx);
+            });
+
+            // Update Progress fill
+            const pct = (currentStepIdx / (formSteps.length - 1)) * 100;
+            progressFill.style.width = `${pct}%`;
+
+            // Update bullets and label styles
+            bullets.forEach((bullet, index) => {
+                bullet.classList.toggle('active', index === currentStepIdx);
+                bullet.classList.toggle('completed', index < currentStepIdx);
+            });
+
+            labels.forEach((label, index) => {
+                label.classList.toggle('active', index === currentStepIdx);
+            });
+
+            // Handle Buttons Visibility
+            prevFormBtn.style.display = currentStepIdx > 0 ? 'inline-flex' : 'none';
+            
+            if (currentStepIdx === formSteps.length - 1) {
+                nextFormBtn.style.display = 'none';
+                submitFormBtn.style.display = 'inline-flex';
+            } else {
+                nextFormBtn.style.display = 'inline-flex';
+                submitFormBtn.style.display = 'none';
+            }
+        };
+
+        // Form Validation for each step
+        const validateStep = (stepIdx) => {
+            let isValid = true;
+            
+            if (stepIdx === 0) {
+                const ageInput = document.getElementById('age');
+                const genderInput = document.getElementById('gender');
+                const errorAge = document.getElementById('error-age');
+                const errorGender = document.getElementById('error-gender');
+                
+                if (!ageInput.value || parseInt(ageInput.value, 10) < 4 || parseInt(ageInput.value, 10) > 70) {
+                    errorAge.style.display = 'block';
+                    isValid = false;
+                } else {
+                    errorAge.style.display = 'none';
+                }
+
+                if (!genderInput.value) {
+                    errorGender.style.display = 'block';
+                    isValid = false;
+                } else {
+                    errorGender.style.display = 'none';
+                }
+            } else if (stepIdx === 1) {
+                const readRadio = document.querySelector('input[name="reading_speed"]:checked');
+                const dirRadio = document.querySelector('input[name="left_right_difficulty"]:checked');
+                const errorRead = document.getElementById('error-read');
+                const errorDir = document.getElementById('error-dir');
+
+                if (!readRadio) {
+                    errorRead.style.display = 'block';
+                    isValid = false;
+                } else {
+                    errorRead.style.display = 'none';
+                }
+
+                if (!dirRadio) {
+                    errorDir.style.display = 'block';
+                    isValid = false;
+                } else {
+                    errorDir.style.display = 'none';
+                }
+            } else if (stepIdx === 2) {
+                const fileErr = document.getElementById('error-file');
+                if (!fileInput.files.length) {
+                    fileErr.style.display = 'block';
+                    isValid = false;
+                } else {
+                    fileErr.style.display = 'none';
+                }
+            }
+
+            return isValid;
+        };
+
+        nextFormBtn.addEventListener('click', () => {
+            if (validateStep(currentStepIdx)) {
+                currentStepIdx++;
+                updateFormSteps();
+            }
+        });
+
+        prevFormBtn.addEventListener('click', () => {
+            currentStepIdx--;
+            updateFormSteps();
+        });
+
+        // Style helper for Radio Button Cards
+        const radioCards = document.querySelectorAll('.radio-card');
+        radioCards.forEach(card => {
+            const radio = card.querySelector('input[type="radio"]');
+            
+            // Initial checks
+            if (radio.checked) {
+                card.classList.add('selected');
+            }
+
+            card.addEventListener('click', () => {
+                // Remove selected from siblings
+                const groupName = radio.name;
+                document.querySelectorAll(`input[name="${groupName}"]`).forEach(siblingRadio => {
+                    siblingRadio.closest('.radio-card').classList.remove('selected');
+                });
+                
+                radio.checked = true;
+                card.classList.add('selected');
+            });
+        });
+
+        // --- File Upload Logic ---
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        ['dragleave', 'dragend'].forEach(type => {
+            dropZone.addEventListener(type, () => {
+                dropZone.classList.remove('dragover');
+            });
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect();
+            }
+        });
+
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect() {
+            const file = fileInput.files[0];
+            if (file) {
+                fileNameSpan.textContent = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    dropZone.style.display = 'none';
+                    previewContainer.style.display = 'block';
+                    document.getElementById('error-file').style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        changeBtn.addEventListener('click', () => {
+            fileInput.value = '';
+            dropZone.style.display = 'block';
+            previewContainer.style.display = 'none';
+        });
+
+        // Show spinner loader on form submission
+        assessmentForm.addEventListener('submit', (e) => {
+            if (!validateStep(2)) {
+                e.preventDefault();
+                return;
+            }
+            
+            // Set loading state
+            submitFormBtn.setAttribute('disabled', 'true');
+            prevFormBtn.setAttribute('disabled', 'true');
+            changeBtn.style.display = 'none';
+            spinner.style.display = 'block';
+            submitText.innerHTML = 'Analyzing handwriting profiles...';
+        });
+    </script>
 </body>
 </html>

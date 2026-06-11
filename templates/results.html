@@ -3,72 +3,585 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prediction Result</title>
+    <title>LexiMind AI | Diagnostic Assessment Results</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #141e30, #243b55);
-            color: white;
-            text-align: center;
+        :root {
+            --bg-dark: #080c14;
+            --bg-darker: #05070c;
+            --card-bg: rgba(15, 23, 42, 0.45);
+            --card-border: rgba(255, 255, 255, 0.06);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.15);
+            --accent-cyan: #06b6d4;
+            --accent-purple: #a855f7;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 10%, rgba(168, 85, 247, 0.12) 0px, transparent 50%),
+                radial-gradient(at 50% 80%, rgba(6, 182, 212, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
+
+        header {
+            padding: 40px 20px 20px 20px;
+            text-align: center;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+        }
+
         h1 {
-            margin-top: 40px;
-            font-size: 2.5rem;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .result-box {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 500px;
-            margin: 50px auto;
-            box-shadow: 0px 0px 20px rgba(0,0,0,0.3);
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1.2fr 1.8fr;
+            gap: 24px;
         }
-        img {
-            max-width: 300px;
-            border-radius: 10px;
-            margin-top: 20px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
         }
-        .prediction {
-            margin-top: 20px;
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #ff9800;
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+            margin-bottom: 24px;
+            transition: var(--transition);
         }
-        .back-btn {
-            margin-top: 20px;
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(99, 102, 241, 0.15);
+            box-shadow: 0 12px 35px -8px rgba(0,0,0,0.6);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding-bottom: 12px;
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        /* Diagnostic Banner */
+        .banner {
+            grid-column: 1 / -1;
+            padding: 24px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            animation: fadeIn 0.5s ease-out;
+            margin-bottom: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .banner-danger {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #fca5a5;
+        }
+
+        .banner-success {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #a7f3d0;
+        }
+
+        .banner-icon {
+            font-size: 3rem;
+        }
+
+        .banner-text h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        /* Image Display */
+        .source-image-container {
+            text-align: center;
+        }
+
+        .source-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Profile details list */
+        .profile-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 20px;
+        }
+
+        .profile-item {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 8px;
+            padding: 10px 14px;
+        }
+
+        .profile-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .profile-val {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        .metric-item {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .metric-val {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            font-family: 'Outfit', sans-serif;
+            margin-bottom: 4px;
+        }
+
+        .metric-val.high-variance {
+            color: var(--accent-danger);
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Spelling table */
+        .spelling-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+
+        .spelling-table th {
+            text-align: left;
+            padding: 10px;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-weight: 600;
+        }
+
+        .spelling-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .spelling-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
             display: inline-block;
-            padding: 12px 25px;
-            background: #4CAF50;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-danger { background: rgba(239,68,68,0.15); color: #f87171; }
+        .badge-warning { background: rgba(245,158,11,0.15); color: #fbbf24; }
+
+        /* Character Grid */
+        .char-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 16px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        /* Scrollbar styles */
+        .char-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+        .char-grid::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+
+        .char-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .char-card.Reversal {
+            border-color: rgba(239, 68, 68, 0.25);
+            background: rgba(239, 68, 68, 0.02);
+        }
+
+        .char-card.Corrected {
+            border-color: rgba(245, 158, 11, 0.25);
+            background: rgba(245, 158, 11, 0.02);
+        }
+
+        .char-label-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .char-label-badge.Normal { background: rgba(16,185,129,0.15); color: #34d399; }
+        .char-label-badge.Corrected { background: rgba(245,158,11,0.15); color: #fbbf24; }
+        .char-label-badge.Reversal { background: rgba(239,68,68,0.15); color: #f87171; }
+
+        .char-display-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin: 16px 0 8px 0;
+        }
+
+        .char-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.08);
+            object-fit: cover;
+            background: #000;
+        }
+
+        .char-symbol {
+            font-size: 1.4rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-main);
+        }
+
+        .char-prob {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Actions */
+        .actions {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            background: var(--primary);
             border: none;
             border-radius: 8px;
             color: white;
             font-size: 1rem;
-            cursor: pointer;
+            font-weight: 600;
             text-decoration: none;
-            transition: background 0.3s ease;
+            cursor: pointer;
+            transition: var(--transition);
         }
-        .back-btn:hover {
-            background: #45a049;
-        }
-        .icon {
-            font-size: 4rem;
-            color: #ff9800;
+
+        .btn:hover {
+            background: #4f46e5;
+            transform: translateY(-1px);
         }
     </style>
 </head>
 <body>
-    <h1>Prediction Result</h1>
 
-    <div class="result-box">
-        <i class="fas fa-brain icon"></i>
-        <p class="prediction">{{ prediction_text }}</p>
-        <img src="{{ url_for('static', filename=image_file) }}" alt="Uploaded Image">
-        <br>
-        <a href="/" class="back-btn"><i class="fas fa-arrow-left"></i> Try Another Image</a>
+    <header>
+        <h1>LexiMind AI Diagnostic Report</h1>
+    </header>
+
+    <div class="container">
+        
+        <!-- DIAGNOSTIC WARNING BANNER -->
+        {% if dyslexic_detected %}
+        <div class="banner banner-danger" role="alert">
+            <i class="fas fa-exclamation-triangle banner-icon" aria-hidden="true"></i>
+            <div class="banner-text">
+                <h2>Dyslexic Indicators Detected</h2>
+                <p>The candidate profile exhibits character reversals, high baseline layout drift, or reading speed discrepancies.</p>
+                <p style="font-weight: bold; margin-top: 8px; font-size: 1.1rem; color: #fca5a5;">Final Calculated Risk: {{ "%.1f"|format(dyslexia_percentage) }}%</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="banner banner-success" role="alert">
+            <i class="fas fa-check-circle banner-icon" aria-hidden="true"></i>
+            <div class="banner-text">
+                <h2>No Dyslexic Indicators Detected</h2>
+                <p>The handwriting coordinates, character stroke features, and spelling metrics fall within the standard range.</p>
+                <p style="font-weight: bold; margin-top: 8px; font-size: 1.1rem; color: #a7f3d0;">Final Calculated Risk: {{ "%.1f"|format(dyslexia_percentage) }}%</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- LEFT COLUMN: DIAGNOSTIC REPORT AND METRICS -->
+        <div>
+            <!-- FINAL REPORT CARD -->
+            <div class="card" style="background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.1)); border-color: var(--primary);">
+                <div class="card-title" style="border-bottom-color: rgba(99,102,241,0.2);">
+                    <i class="fas fa-file-medical-alt" aria-hidden="true"></i> Assessment Risk Summary
+                </div>
+                <div style="font-size: 1.05rem; line-height: 1.6;">
+                    <p>Based on neural stroke segmentation and spatial markers, the system predicts a <strong>Dyslexia Risk of {{ "%.1f"|format(dyslexia_percentage) }}%</strong>.</p>
+                    <p style="margin-top: 12px; font-weight: 600;">Key Machine Learning Findings:</p>
+                    <ul style="margin-top: 5px; color: var(--text-muted); padding-left: 20px; font-size: 0.95rem;">
+                        <li><strong>Character Integrity:</strong> {{ reversal|length }} reversals, {{ corrected|length }} corrected letters out of {{ normal|length + corrected|length + reversal|length }} segmented characters.</li>
+                        <li><strong>Alignment Deviation:</strong> Baseline deviation is {{ "%.2f"|format(layout_report['Baseline Deviation']) }} (Threshold &lt; 15.0).</li>
+                        <li><strong>Lexical Accuracy:</strong> {{ spelling_report['Diagnostics']|length }} spelling anomalies detected.</li>
+                    </ul>
+                </div>
+                <div style="margin-top: 24px; display: flex; align-items: center; gap: 15px;">
+                    <div style="flex-grow: 1; height: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; border: 1px solid var(--card-border);">
+                        <div style="height: 100%; width: {{ dyslexia_percentage }}%; background: {% if dyslexia_percentage > 50 %}var(--accent-danger){% elif dyslexia_percentage > 20 %}var(--accent-warning){% else %}var(--accent-success){% endif %}; transition: width 1s ease;"></div>
+                    </div>
+                    <span style="font-weight: 800; font-size: 1.2rem; color: {% if dyslexia_percentage > 50 %}var(--accent-danger){% elif dyslexia_percentage > 20 %}var(--accent-warning){% else %}var(--accent-success){% endif %};">{{ "%.1f"|format(dyslexia_percentage) }}% Risk</span>
+                </div>
+            </div>
+
+            <!-- CANDIDATE SCREENING PROFILE -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-user-circle"></i> Candidate Screening Profile
+                </div>
+                <ul class="profile-list">
+                    <li class="profile-item">
+                        <div class="profile-label">Age</div>
+                        <div class="profile-val">{{ questionnaire.age }} years</div>
+                    </li>
+                    <li class="profile-item">
+                        <div class="profile-label">Gender</div>
+                        <div class="profile-val">{{ questionnaire.gender }}</div>
+                    </li>
+                    <li class="profile-item">
+                        <div class="profile-label">Reading Speed</div>
+                        <div class="profile-val">{{ 'Slower than peers' if questionnaire.reading_speed == 'Yes' else 'Standard' }}</div>
+                    </li>
+                    <li class="profile-item">
+                        <div class="profile-label">Reversals Frequency</div>
+                        <div class="profile-val">{{ questionnaire.letter_reversals_freq }}</div>
+                    </li>
+                    <li class="profile-item">
+                        <div class="profile-label">Left/Right Orientation</div>
+                        <div class="profile-val">{{ 'Has difficulty' if questionnaire.left_right_difficulty == 'Yes' else 'No issues' }}</div>
+                    </li>
+                    <li class="profile-item">
+                        <div class="profile-label">Spelling Challenge</div>
+                        <div class="profile-val">{{ questionnaire.spelling_difficulty }}</div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- SPATIAL LAYOUT METRICS -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-chart-line" aria-hidden="true"></i> Spatial Layout Metrics
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-val {% if layout_report['Baseline Deviation'] > 15.0 %}high-variance{% endif %}">
+                            {{ "%.2f"|format(layout_report['Baseline Deviation']) }}
+                        </div>
+                        <div class="metric-label">Baseline Dev</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-val {% if layout_report['Spacing Variance'] > 15.0 %}high-variance{% endif %}">
+                            {{ "%.2f"|format(layout_report['Spacing Variance']) }}
+                        </div>
+                        <div class="metric-label">Spacing Var</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-val {% if layout_report['Slant Variability'] > 150.0 %}high-variance{% endif %}">
+                            {{ "%.1f"|format(layout_report['Slant Variability']) }}
+                        </div>
+                        <div class="metric-label">Slant Var</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SPELLING DIAGNOSTICS CARD -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-spellcheck" aria-hidden="true"></i> Spelling Diagnostics
+                </div>
+                {% if spelling_report['Diagnostics'] %}
+                    <table class="spelling-table" aria-label="Spelling Diagnostics Results">
+                        <thead>
+                            <tr>
+                                <th>Transcribed</th>
+                                <th>Correction</th>
+                                <th>Edit Dist</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for diag in spelling_report['Diagnostics'] %}
+                            <tr>
+                                <td><strong style="color: #fca5a5;">{{ diag['Transcribed'] }}</strong></td>
+                                <td><strong style="color: #86efac;">{{ diag['Suggested'] }}</strong></td>
+                                <td>{{ diag['EditDistance'] }}</td>
+                                <td>
+                                    <span class="badge {% if 'Transposition' in diag['Pattern'] or 'Vowel' in diag['Pattern'] %}badge-danger{% else %}badge-warning{% endif %}">
+                                        {{ diag['Pattern'] }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin: 5px 0 0 0;">
+                        No spelling anomalies detected. Lexical sequence matches standard models.
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- ORIGINAL SOURCE IMAGE -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-image" aria-hidden="true"></i> Original Document Source
+                </div>
+                <div class="source-image-container">
+                    <img src="{{ url_for('uploaded_file', filename=filename) }}" class="source-image" alt="Analyzed Document Source">
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: VISUAL LETTER ANALYSIS & HEATMAPS -->
+        <div>
+            <div class="card" style="height: calc(100% - 24px);">
+                <div class="card-title">
+                    <i class="fas fa-magnifying-glass-chart" aria-hidden="true"></i> Segmented Character Profiles
+                </div>
+                
+                {% if letter_reports %}
+                    <div class="char-grid">
+                        {% for report in letter_reports %}
+                            <div class="char-card {{ report['class'] }}">
+                                <span class="char-label-badge {{ report['class'] }}">{{ report['class'] }}</span>
+                                
+                                <div class="char-display-box">
+                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                        <img src="{{ url_for('static', filename=report['crop_path']) }}" class="char-img" alt="Letter Crop">
+                                        <span style="font-size: 0.7rem; color: var(--text-muted);">Source</span>
+                                    </div>
+                                    
+                                    {% if report['gradcam_path'] %}
+                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                        <img src="{{ url_for('static', filename=report['gradcam_path']) }}" class="char-img" alt="Grad-CAM Overlay">
+                                        <span style="font-size: 0.7rem; color: var(--accent-warning);">Grad-CAM</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="char-symbol">"{{ report['char'] }}"</div>
+                                <div class="char-prob">Conf: {{ "%.2f"|format(report['confidence'] * 100) }}%</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color: var(--text-muted); margin: 20px 0;">No alphabetical characters were successfully segmented from this document.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- BACK TO PORTAL -->
+        <div class="actions">
+            <a href="/" class="btn"><i class="fas fa-arrow-left"></i> Return to Screening Portal</a>
+        </div>
+
     </div>
+
 </body>
 </html>
